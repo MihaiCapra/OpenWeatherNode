@@ -19,7 +19,8 @@ public class SqlInjector {
 
             con = DriverManager.getConnection(url, user, password);
             Statement st = con.createStatement();
-
+            st.executeUpdate("DELETE FROM " + table);
+            
             st.executeUpdate("INSERT INTO " + table + " " +
                     "(`city`, `current_temp`, `sunrise`, `sunset`, `weather_description`, " +
                     "`weather_icon`, `min_temp`, `max_temp`, `wind_speed`, `wind_direction`, " +

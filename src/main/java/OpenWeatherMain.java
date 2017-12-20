@@ -8,6 +8,8 @@ import retrofit2.Response;
 import sql.SqlInjector;
 import sql.WeatherData;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -62,6 +64,7 @@ public class OpenWeatherMain implements
         this.mForecastWeather = response.body();
         System.out.println(String.format("[FORECAST] %s", mForecastWeather.getCity().getName()));
 
+        String timeStamp = new SimpleDateFormat("dd/MM/yyyy HH:mm").format(Calendar.getInstance().getTime());
         //insert in database
         SqlInject(new WeatherData(
                 this.mCurrentWeather.getName(),
@@ -74,7 +77,7 @@ public class OpenWeatherMain implements
                 this.mForecastWeather.getList().get(0).getTemp().getMax(),
                 this.mCurrentWeather.getWind().getSpeed(),
                 this.mCurrentWeather.getWind().getDeg(),
-                this.mCurrentWeather.getDt().toString(),
+                timeStamp ,
 
                 this.mForecastWeather.getList().get(1).getDt(),
                 this.mForecastWeather.getList().get(1).getWeather().get(0).getIcon(),
