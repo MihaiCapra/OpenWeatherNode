@@ -5,25 +5,26 @@ import models.ForecastWeather;
 import network.DownloadCurrentWeather;
 import network.DownloadForecastWeather;
 import retrofit2.Response;
+import sql.SqlInjector;
+import sql.WeatherData;
 
 public class OpenWeatherMain implements
         AsyncResponseCurrentWeather,
-        AsyncResponseForecastWeather{
+        AsyncResponseForecastWeather {
 
     private CurrentWeather mCurrentWeather;
     private ForecastWeather mForecastWeather;
 
-    public static void main(String[] args){
+    public static void main(String[] args) {
         OpenWeatherMain main = new OpenWeatherMain();
         main.getCurrentWeather();
-        main.getForecastWeather();
     }
 
     /**
      * this is an instance of Downloader class for CurrentWeather
      * with Main class context as parameter
      */
-    private void getCurrentWeather(){
+    private void getCurrentWeather() {
         new DownloadCurrentWeather(this);
     }
 
@@ -31,23 +32,71 @@ public class OpenWeatherMain implements
      * this is an instance of downloader class for forecast weather with
      * Main class as parameter
      */
-    private void getForecastWeather(){
+    private void getForecastWeather() {
         new DownloadForecastWeather(this);
     }
+
     /**
      * @param response is the full JSON response in format of CurrentWeather class
      */
     public void onLoadCurrentWeatherFinished(Response<CurrentWeather> response) {
         this.mCurrentWeather = response.body();
+        getForecastWeather();
         System.out.println(String.format("[CURRENT] %s", mCurrentWeather.getName()));
     }
 
     /**
-     *
      * @param response is the JSON response in format of ForecastWeather class
      */
     public void onResponseForecastFinished(Response<ForecastWeather> response) {
         this.mForecastWeather = response.body();
         System.out.println(String.format("[FORECAST] %s", mForecastWeather.getCity().getName()));
+
+        //insert in database
+        SqlInject(new WeatherData(
+                mCurrentWeather.getName(),
+                mCurrentWeather.getMain().getTemp().doubleValue(),
+                mCurrentWeather.getSys().getSunrise(),
+                mCurrentWeather.getSys().getSunset(),
+                mCurrentWeather.getWeather().get(0).getDescription(),
+                mCurrentWeather.getWeather().get(0).getIcon(),
+                mCurrentWeather.getMain().getTempMin().doubleValue(),
+                mCurrentWeather.getMain().getTempMax().doubleValue(),
+                mCurrentWeather.getWind().getSpeed(),
+                mCurrentWeather.getWind().getDeg(),
+                mCurrentWeather.getDt().toString(),
+
+                mForecastWeather.getList().get(0).getDt(),
+                mForecastWeather.getList().get(0).getWeather().get(0).getIcon(),
+                mForecastWeather.getList().get(0).getWeather().get(0).getDescription(),
+                mForecastWeather.getList().get(0).getTemp().getMin(),
+                mForecastWeather.getList().get(0).getTemp().getMax(),
+
+                mForecastWeather.getList().get(1).getDt(),
+                mForecastWeather.getList().get(1).getWeather().get(0).getIcon(),
+                mForecastWeather.getList().get(1).getWeather().get(0).getDescription(),
+                mForecastWeather.getList().get(1).getTemp().getMin(),
+                mForecastWeather.getList().get(1).getTemp().getMax(),
+
+                mForecastWeather.getList().get(2).getDt(),
+                mForecastWeather.getList().get(2).getWeather().get(0).getIcon(),
+                mForecastWeather.getList().get(2).getWeather().get(0).getDescription(),
+                mForecastWeather.getList().get(2).getTemp().getMin(),
+                mForecastWeather.getList().get(2).getTemp().getMax(),
+
+                mForecastWeather.getList().get(3).getDt(),
+                mForecastWeather.getList().get(3).getWeather().get(0).getIcon(),
+                mForecastWeather.getList().get(3).getWeather().get(0).getDescription(),
+                mForecastWeather.getList().get(3).getTemp().getMin(),
+                mForecastWeather.getList().get(3).getTemp().getMax()
+                ));
     }
+
+    /**
+     * @param weatherData - the object inserted in database with its fields
+     */
+    private void SqlInject(WeatherData weatherData) {
+        SqlInjector.insertData(weatherData);
+    }
+
 }
