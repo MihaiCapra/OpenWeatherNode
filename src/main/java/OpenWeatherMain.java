@@ -8,6 +8,10 @@ import retrofit2.Response;
 import sql.SqlInjector;
 import sql.WeatherData;
 
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
 public class OpenWeatherMain implements
         AsyncResponseCurrentWeather,
         AsyncResponseForecastWeather {
@@ -16,8 +20,14 @@ public class OpenWeatherMain implements
     private ForecastWeather mForecastWeather;
 
     public static void main(String[] args) {
-        OpenWeatherMain main = new OpenWeatherMain();
-        main.getCurrentWeather();
+        final OpenWeatherMain main = new OpenWeatherMain();
+        ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(1);
+        scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
+            public void run() {
+                System.out.println("[DOWNLOAD TASK]");
+                main.getCurrentWeather();
+            }
+        }, 0, 1, TimeUnit.MINUTES);
     }
 
     /**

@@ -61,9 +61,9 @@ public class SqlInjector {
                     data.max_temp_4 +
                     ")");
             con.close();
-            System.out.println("Sent");
+            System.out.println("[SENT]");
         } catch (SQLException ex) {
-            System.out.println("Error: " + ex);
+            System.out.println(String.format("[ERROR: %s]", ex));
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
